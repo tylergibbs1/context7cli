@@ -1,6 +1,6 @@
 {
-  "name": "@tylergibbs1/context7cli",
-  "version": "0.1.1",
+  "name": "c7-cli",
+  "version": "0.1.2",
   "description": "Context7 CLI for AI agents - fetch up-to-date library documentation",
   "type": "module",
   "bin": {
