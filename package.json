@@ -1,0 +1,20 @@
+{
+  "name": "context7cli",
+  "version": "0.1.0",
+  "description": "Context7 CLI for AI agents - fetch up-to-date library documentation",
+  "type": "module",
+  "bin": {
+    "context7": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "dev": "bun run src/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.7.0"
+  },
+  "license": "MIT"
+}
