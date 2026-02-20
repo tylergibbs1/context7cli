@@ -1,0 +1,146 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-binaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build binaries
+        run: bash scripts/build-binaries.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: binaries/
+
+  github-release:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: binaries/
+
+      - name: Compute checksums
+        run: |
+          cd binaries
+          sha256sum * > checksums.txt
+          cat checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            binaries/context7-linux-x64
+            binaries/context7-linux-arm64
+            binaries/context7-darwin-x64
+            binaries/context7-darwin-arm64
+            binaries/context7-windows-x64.exe
+            binaries/checksums.txt
+
+  npm-publish:
+    needs: github-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Build for Node
+        run: bun run build
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  homebrew-update:
+    needs: github-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download darwin binaries
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          base="https://github.com/tylergibbs1/context7cli/releases/download/${tag}"
+          curl -fsSL "${base}/context7-darwin-arm64" -o context7-darwin-arm64
+          curl -fsSL "${base}/context7-darwin-x64" -o context7-darwin-x64
+
+      - name: Compute SHAs
+        id: shas
+        run: |
+          echo "arm64=$(sha256sum context7-darwin-arm64 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          echo "x64=$(sha256sum context7-darwin-x64 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Update Homebrew tap
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/tylergibbs1/homebrew-context7cli.git" tap
+          cd tap
+
+          tag="${GITHUB_REF_NAME}"
+          version="${{ steps.version.outputs.version }}"
+          arm64_sha="${{ steps.shas.outputs.arm64 }}"
+          x64_sha="${{ steps.shas.outputs.x64 }}"
+          base_url="https://github.com/tylergibbs1/context7cli/releases/download/${tag}"
+
+          cat > Formula/context7cli.rb << FORMULA
+          class Context7cli < Formula
+            desc "Context7 CLI for AI agents - fetch up-to-date library documentation"
+            homepage "https://github.com/tylergibbs1/context7cli"
+            version "${version}"
+            license "MIT"
+
+            on_macos do
+              on_arm do
+                url "${base_url}/context7-darwin-arm64"
+                sha256 "${arm64_sha}"
+              end
+              on_intel do
+                url "${base_url}/context7-darwin-x64"
+                sha256 "${x64_sha}"
+              end
+            end
+
+            def install
+              binary_name = "context7-darwin-#{Hardware::CPU.arch == :arm64 ? "arm64" : "x64"}"
+              bin.install Dir["context7-darwin-*"].first => "context7"
+            end
+
+            test do
+              assert_match "context7", shell_output("#{bin}/context7 --help", 0)
+            end
+          end
+          FORMULA
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/context7cli.rb
+          git commit -m "Update context7cli to ${version}"
+          git push

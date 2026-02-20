@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 import { searchCommand } from "./commands/search.js";
 import { docsCommand } from "./commands/docs.js";
 import { failure } from "./output.js";

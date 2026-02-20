@@ -6,8 +6,35 @@
   "bin": {
     "context7": "./dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tylergibbs1/context7cli.git"
+  },
+  "keywords": [
+    "context7",
+    "cli",
+    "documentation",
+    "ai",
+    "library-docs",
+    "mcp"
+  ],
+  "author": "Tyler Gibbs",
+  "homepage": "https://github.com/tylergibbs1/context7cli#readme",
+  "bugs": {
+    "url": "https://github.com/tylergibbs1/context7cli/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist/index.js",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build": "bun build src/index.ts --outdir dist --target node",
+    "build:bun": "bun build src/index.ts --outdir dist --target bun",
+    "build:binaries": "bash scripts/build-binaries.sh",
     "dev": "bun run src/index.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"

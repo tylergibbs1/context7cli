@@ -6,12 +6,52 @@ Two commands. No intermediate steps. Token-budgeted responses.
 
 ## Install
 
+### npm
+
 ```bash
+npm install -g context7cli
+```
+
+### Homebrew (macOS)
+
+```bash
+brew install tylergibbs1/context7cli/context7cli
+```
+
+### curl (macOS / Linux / WSL)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tylergibbs1/context7cli/main/install.sh | bash
+```
+
+Pin a version:
+
+```bash
+VERSION=v0.1.0 curl -fsSL https://raw.githubusercontent.com/tylergibbs1/context7cli/main/install.sh | bash
+```
+
+### PowerShell (Windows)
+
+```powershell
+irm https://raw.githubusercontent.com/tylergibbs1/context7cli/main/install.ps1 | iex
+```
+
+Pin a version:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/tylergibbs1/context7cli/main/install.ps1))) -Version v0.1.0
+```
+
+### From source
+
+```bash
+git clone https://github.com/tylergibbs1/context7cli.git
+cd context7cli
 bun install
 bun run build
 ```
 
-The built CLI is at `dist/index.js`. The `context7` bin is available after a global or local install.
+The built CLI is at `dist/index.js`. Link it globally with `npm link`.
 
 ## Commands
 
