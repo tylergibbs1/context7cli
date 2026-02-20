@@ -1,6 +1,6 @@
 {
-  "name": "c7-cli",
-  "version": "0.1.2",
+  "name": "@grayhaven/context7cli",
+  "version": "0.1.3",
   "description": "Context7 CLI for AI agents - fetch up-to-date library documentation",
   "type": "module",
   "bin": {

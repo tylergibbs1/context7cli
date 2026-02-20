@@ -9,7 +9,7 @@ Two commands. No intermediate steps. Token-budgeted responses.
 ### npm
 
 ```bash
-npm install -g c7-cli
+npm install -g @grayhaven/context7cli
 ```
 
 ### Homebrew (macOS)
