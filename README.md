@@ -138,15 +138,23 @@ context7 docs nextjs --topic hooks --detail full
 | `--detail <concise\|full>` | Response detail level | `concise` |
 | `--help` | Show help | — |
 
-## Authentication
+## Authentication & Rate Limits
 
-Optional. Set `CONTEXT7_API_KEY` for higher rate limits:
+The Context7 API is free but rate-limited:
+
+| Plan | Cost | Limits |
+|------|------|--------|
+| Free (no key) | $0 | 1,000 req/month, 60 req/hr |
+| Free (with key) | $0 | Higher limits |
+| Pro | $7/seat/month | Higher limits, private repos |
+
+Set `CONTEXT7_API_KEY` for higher rate limits:
 
 ```bash
 export CONTEXT7_API_KEY=your-key-here
 ```
 
-Get a free key at [context7.com/dashboard](https://context7.com/dashboard).
+Get a free key at [context7.com/dashboard](https://context7.com/dashboard). See [plans & pricing](https://context7.com/docs/plans-pricing) for details.
 
 ## Development
 
